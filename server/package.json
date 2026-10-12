@@ -1,0 +1,16 @@
+{
+  "name": "bitlinks-editor-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch-path=./index.js --watch-path=./lib index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@babel/parser": "7.26.9",
+    "cors": "2.8.5",
+    "diff": "7.0.0",
+    "express": "4.21.2",
+    "parse5": "^7.2.1"
+  }
+}
