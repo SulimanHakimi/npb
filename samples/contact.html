@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Bitlinks</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1d2433;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: #ffffff;
+      border-bottom: 1px solid #e3e8f0;
+    }
+    .logo { font-size: 22px; font-weight: 800; color: #3b5bdb; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: #4a5568; text-decoration: none; font-size: 15px; }
+    .hero { text-align: center; padding: 64px 24px 32px; }
+    .hero h1 { font-size: 44px; margin: 0 0 12px; }
+    .hero p { font-size: 18px; color: #5a6578; margin: 0; }
+    .wrap {
+      display: flex;
+      gap: 32px;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 24px 72px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e3e8f0;
+      border-radius: 14px;
+      padding: 32px;
+    }
+    .form-card { flex: 2; }
+    .info-card { flex: 1; }
+    .card h2 { font-size: 22px; margin: 0 0 20px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cfd7e3;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      margin-bottom: 18px;
+    }
+    textarea { height: 130px; resize: vertical; }
+    .btn {
+      background: #3b5bdb;
+      color: #ffffff;
+      border: 0;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .info-item { margin-bottom: 22px; }
+    .info-item h3 { font-size: 15px; margin: 0 0 4px; color: #3b5bdb; }
+    .info-item p { margin: 0; font-size: 15px; color: #4a5568; }
+    .footer {
+      text-align: center;
+      padding: 28px;
+      color: #8a94a6;
+      font-size: 14px;
+      border-top: 1px solid #e3e8f0;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="logo">Bitlinks</div>
+    <nav class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Pricing</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Get in touch</h1>
+    <p>Questions about links, analytics or pricing? We usually reply within a day.</p>
+  </section>
+
+  <main class="wrap">
+    <div class="card form-card">
+      <h2>Send us a message</h2>
+      <form>
+        <label for="name">Your name</label>
+        <input id="name" type="text" placeholder="Ali Ahmadi">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com">
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="How can we help?"></textarea>
+        <button class="btn" type="button">Send message</button>
+      </form>
+    </div>
+
+    <div class="card info-card">
+      <h2>Contact details</h2>
+      <div class="info-item">
+        <h3>Email</h3>
+        <p>hello@bitlinks.example</p>
+      </div>
+      <div class="info-item">
+        <h3>Phone</h3>
+        <p>+93 700 000 000</p>
+      </div>
+      <div class="info-item">
+        <h3>Office</h3>
+        <p>Shahr-e Naw, Kabul, Afghanistan</p>
+      </div>
+      <div class="info-item">
+        <h3>Hours</h3>
+        <p style="color: #2f855a; font-weight: 600;">Sat to Thu, 8:00 to 17:00</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Bitlinks. All rights reserved.</p>
+  </footer>
+</body>
+</html>
