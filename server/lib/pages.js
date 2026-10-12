@@ -1,5 +1,3 @@
-// the nextjs sample page plus uploaded html pages
-// uploads live in client/public/uploads/<slug>/ so their relative links keep working
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,17 +6,6 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, "..", "..");
 const PUBLIC_UPLOADS = path.join(ROOT, "client", "public", "uploads");
 const DATA_DIR = path.join(ROOT, "server", ".pages"); // originals meta and history
-
-const SAMPLE = {
-  id: "landing",
-  kind: "jsx",
-  name: "Landing page (Next.js sample)",
-  route: "/preview",
-  file: "client/app/preview/page.js",
-  abs: path.join(ROOT, "client", "app", "preview", "page.js"),
-  original: path.join(ROOT, "server", "templates", "preview-page.original.js"),
-  uploaded: false,
-};
 
 function uploadedPage(slug, meta) {
   return {
@@ -39,7 +26,7 @@ function uploadedPage(slug, meta) {
 const readMeta = (slug) => fs.readFile(path.join(DATA_DIR, slug, "meta.json"), "utf8").then(JSON.parse).catch(() => null);
 
 export async function listPages() {
-  const pages = [SAMPLE];
+  const pages = [];
   const slugs = await fs.readdir(DATA_DIR).catch(() => []);
   for (const slug of slugs.sort()) {
     const meta = await readMeta(slug);
@@ -49,7 +36,7 @@ export async function listPages() {
 }
 
 export async function getPage(id) {
-  return (await listPages()).find((p) => p.id === (id || SAMPLE.id)) || null;
+  return (await listPages()).find((p) => p.id === id) || null;
 }
 
 export const historyDir = (page) => path.join(DATA_DIR, page.id, "history");
@@ -60,7 +47,6 @@ export function slugify(text) {
 
 export async function uniqueSlug(base) {
   const taken = new Set([
-    SAMPLE.id,
     ...(await fs.readdir(DATA_DIR).catch(() => [])),
     ...(await fs.readdir(PUBLIC_UPLOADS).catch(() => [])),
   ]);
@@ -95,7 +81,6 @@ export async function createUploadedPage(slug, { name, sourceName, htmlFile, htm
 }
 
 export async function deleteUploadedPage(page) {
-  if (!page.uploaded) throw new Error("The sample page can't be removed");
   await fs.rm(path.join(PUBLIC_UPLOADS, page.id), { recursive: true, force: true });
   await fs.rm(path.join(DATA_DIR, page.id), { recursive: true, force: true });
 }

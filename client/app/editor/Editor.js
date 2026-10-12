@@ -13,7 +13,7 @@ const CANVAS_WIDTH = 1280;
 const HANDLES = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
 
 export default function Editor() {
-  const [pages, setPages] = useState([]);
+  const [pages, setPages] = useState(null); // null until the first load
   const [health, setHealth] = useState(null);
   const [page, setPage] = useState(null);
   const [frameKey, setFrameKey] = useState(0);
@@ -236,7 +236,7 @@ export default function Editor() {
     if (!el) { setSelectedId(null); return; }
     setSelectedId(el.dataset.editId);
     setRightTab("inspect");
-    if (el.dataset.editId !== "page") startDrag(e, el, "move");
+    startDrag(e, el, "move");
   };
 
   const onOverlayPointerMove = (e) => {
@@ -294,7 +294,7 @@ export default function Editor() {
       if (e.key === "Escape") return setSelectedId(null);
       const step = e.shiftKey ? 10 : 1;
       const delta = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
-      if (!delta || selectedId === "page") return;
+      if (!delta) return;
       e.preventDefault();
       const cs = doc().defaultView.getComputedStyle(el);
       commit(el, {
@@ -404,33 +404,32 @@ export default function Editor() {
           <span className="sx-tape sx-tape-l" aria-hidden />
           <span className="sx-tape sx-tape-r" aria-hidden />
           <div className="sx-wordmark">bitlinks<span>/studio</span></div>
-          <h1>Pick a page to edit</h1>
+          <h1>{pages?.length ? "Pick a page to edit" : "Add a page to start"}</h1>
           <p>
-            The page opens on the board exactly as Next.js renders it. Move, resize and retype things there.
-            Nothing touches the file until you apply your changes.
+            Upload an HTML page with its CSS and images. It opens on the board exactly as the browser shows it.
+            Move, resize and retype things there. Nothing touches the file until you apply your changes.
           </p>
           <ul className="sx-files">
-            {pages.length === 0 && (
+            {!pages?.length && (
               <li className="sx-files-empty">
                 {health?.ok === false
                   ? "Can't reach the editor server on port 4000. Run npm run dev from the project folder."
-                  : "Looking for pages..."}
+                  : pages === null
+                    ? "Looking for pages..."
+                    : "No pages yet. Upload one below and it will show up here."}
               </li>
             )}
-            {pages.map((p) => (
+            {pages?.map((p) => (
               <li key={p.id} className="sx-file-row">
                 <button className="sx-file-open-btn" onClick={() => openPage(p)}>
                   <span className="sx-file-name">
                     {p.name}
-                    {p.uploaded ? <em className="sx-file-badge">html</em> : <em className="sx-file-badge sample">sample</em>}
                   </span>
                   <span className="sx-file-path">{p.file}</span>
                   <span className="sx-file-route">{p.route}</span>
                   <span className="sx-file-open">Open</span>
                 </button>
-                {p.uploaded && (
-                  <button className="sx-file-remove" onClick={() => removePage(p)} aria-label={`Remove ${p.name}`}>Remove</button>
-                )}
+                <button className="sx-file-remove" onClick={() => removePage(p)} aria-label={`Remove ${p.name}`}>Remove</button>
               </li>
             ))}
           </ul>
@@ -565,7 +564,7 @@ export default function Editor() {
                         <div className="sx-sel-dim" style={{ transform: `translateX(-50%) scale(${1 / zoom})` }}>
                           {Math.round(selBox.width)} x {Math.round(selBox.height)}
                         </div>
-                        {!editingId && selectedId !== "page" && HANDLES.map((h) => (
+                        {!editingId && HANDLES.map((h) => (
                           <div
                             key={h}
                             className={`sx-handle sx-h-${h}`}

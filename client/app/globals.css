@@ -108,7 +108,6 @@ html, body { margin: 0; padding: 0; }
 .sx-card .sx-notice p { margin: 0; color: inherit; font-size: inherit; max-width: none; font-weight: 600; }
 .sx-notice ul { margin: 6px 0 0; padding-left: 18px; color: #6b5310; font-weight: 400; }
 .sx-notice li + li { margin-top: 4px; }
-.sx-file-badge.sample { background: var(--paper-2); }
 
 /* editor */
 .sx-root { height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: var(--paper); }

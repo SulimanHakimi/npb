@@ -1,12 +1,9 @@
 // editor api that lists pages and turns canvas changes into source edits
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import { createTwoFilesPatch } from "diff";
-import { applyWithAst } from "./lib/astEngine.js";
-import { listEditIds, parse } from "./lib/jsx.js";
 import { applyToHtml, listHtmlIds, parseHtml } from "./lib/htmlEdit.js";
 import { prepareHtmlUpload, UploadError } from "./lib/htmlUpload.js";
 import {
@@ -14,19 +11,12 @@ import {
   createUploadedPage, deleteUploadedPage, publicPage,
 } from "./lib/pages.js";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 4000;
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "12mb" })); // uploads come in as base64
-
-// jsx for the sample page and html for uploads
-const ENGINES = {
-  jsx: { apply: applyWithAst, ids: listEditIds, parse },
-  html: { apply: applyToHtml, ids: listHtmlIds, parse: parseHtml },
-};
 
 async function pageFrom(req, res) {
   const id = req.query.page || req.body?.page;
@@ -50,14 +40,14 @@ function makeDiff(page, before, after) {
 }
 
 // refuse output that doesn't parse or lost an editable element
-function validate(engine, original, updated) {
+function validate(original, updated) {
   try {
-    engine.parse(updated);
+    parseHtml(updated);
   } catch (e) {
     return `updated code does not parse: ${e.message}`;
   }
-  const after = new Set(engine.ids(updated));
-  const missing = engine.ids(original).filter((id) => !after.has(id));
+  const after = new Set(listHtmlIds(updated));
+  const missing = listHtmlIds(original).filter((id) => !after.has(id));
   if (missing.length) return `updated code lost data-edit-id(s): ${missing.join(", ")}`;
   return null;
 }
@@ -72,7 +62,7 @@ app.get("/api/source", async (req, res) => {
   const page = await pageFrom(req, res);
   if (!page) return;
   const code = await read(page);
-  res.json({ file: page.file, code, editIds: ENGINES[page.kind].ids(code) });
+  res.json({ file: page.file, code, editIds: listHtmlIds(code) });
 });
 
 // each file has a name and content plus utf8 or base64 encoding
@@ -128,15 +118,14 @@ app.post("/api/apply", async (req, res) => {
     return res.status(400).json({ ok: false, error: "No changes to apply" });
   }
 
-  const engine = ENGINES[page.kind];
   const original = await read(page);
   let result;
   try {
-    result = engine.apply(original, changes);
+    result = applyToHtml(original, changes);
   } catch (e) {
     return res.status(500).json({ ok: false, error: e.message });
   }
-  const problem = validate(engine, original, result.code);
+  const problem = validate(original, result.code);
   if (problem) return res.status(500).json({ ok: false, error: problem });
 
   if (result.code === original) {
@@ -171,18 +160,6 @@ app.post("/api/reset", async (req, res) => {
   res.json({ ok: true, diff: makeDiff(page, current, original), code: original });
 });
 
-// old installs kept all history in one folder
-async function migrateOldHistory() {
-  const old = path.join(here, ".history");
-  const files = await fs.readdir(old).catch(() => null);
-  if (!files) return;
-  const dir = historyDir(await getPage("landing"));
-  await fs.mkdir(dir, { recursive: true });
-  for (const f of files) await fs.rename(path.join(old, f), path.join(dir, f));
-  await fs.rm(old, { recursive: true, force: true });
-}
-
-await migrateOldHistory();
 app.listen(PORT, () => {
   console.log(`Editor API on http://localhost:${PORT}`);
 });

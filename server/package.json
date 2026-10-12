@@ -7,7 +7,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@babel/parser": "7.26.9",
     "cors": "2.8.5",
     "diff": "7.0.0",
     "express": "4.21.2",
